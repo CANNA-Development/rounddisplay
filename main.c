@@ -22,8 +22,8 @@ int main()
         .data = asim_buffer,
         .width = LCD_WIDTH,
         .height = LCD_HEIGHT,
-        .format = PIXELFORMAT_UNCOMPRESSED_R5G6B5,
-        .mipmaps = 1
+        .mipmaps = 1,
+        .format = PIXELFORMAT_UNCOMPRESSED_R5G6B5
     };
 
 

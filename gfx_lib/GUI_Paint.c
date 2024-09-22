@@ -38,6 +38,8 @@
 #include <string.h> //memset()
 #include <math.h>
 
+#define FLT_EPSILON (1.0e-6f)
+
 volatile PAINT Paint;
 
 
@@ -218,7 +220,7 @@ void Paint_DrawPoint( UWORD Xpoint,       UWORD Ypoint, UWORD Color,
         return;
     }
 
-    int16_t XDir_Num , YDir_Num;
+    WORD XDir_Num , YDir_Num;
     if (Dot_FillWay == DOT_FILL_AROUND) {
         for (XDir_Num = 0; XDir_Num < 2*Dot_Pixel - 1; XDir_Num++) {
             for (YDir_Num = 0; YDir_Num < 2 * Dot_Pixel - 1; YDir_Num++) {
@@ -336,6 +338,54 @@ parameter:
     Color     锛歍he color of the 锛歝ircle segment
     Filled    : Whether it is filled: 1 filling 0锛欴o not
 ******************************************************************************/
+void Paint_DrawArc(  UWORD X_Center, UWORD Y_Center, UWORD Radius, 
+                        UWORD Color, DOT_PIXEL Line_width, DRAW_FILL Draw_Fill )
+
+{
+    if (X_Center > Paint.Width || Y_Center >= Paint.Height) {
+        Debug("Paint_DrawCircle Input exceeds the normal display range\r\n");
+        return;
+    }
+    //Draw a circle from(0, R) as a starting point
+    WORD XCurrent, YCurrent;
+    XCurrent = 0;
+    YCurrent = Radius;
+
+    //Cumulative error,judge the next point of the logo
+    WORD Esp = 3 - (Radius << 1 );
+
+    if (Draw_Fill != DRAW_FILL_FULL) {
+        while (XCurrent <= YCurrent ) {
+            Paint_DrawPoint(X_Center + XCurrent, Y_Center + YCurrent, Color, Line_width, DOT_STYLE_DFT);//1
+            //Paint_DrawPoint(X_Center - XCurrent, Y_Center + YCurrent, Color, Line_width, DOT_STYLE_DFT);//2
+           // Paint_DrawPoint(X_Center - YCurrent, Y_Center + XCurrent, Color, Line_width, DOT_STYLE_DFT);//3
+           // Paint_DrawPoint(X_Center - YCurrent, Y_Center - XCurrent, Color, Line_width, DOT_STYLE_DFT);//4
+           // Paint_DrawPoint(X_Center - XCurrent, Y_Center - YCurrent, Color, Line_width, DOT_STYLE_DFT);//5
+           // Paint_DrawPoint(X_Center + XCurrent, Y_Center - YCurrent, Color, Line_width, DOT_STYLE_DFT);//6
+           // Paint_DrawPoint(X_Center + YCurrent, Y_Center - XCurrent, Color, Line_width, DOT_STYLE_DFT);//7
+           // Paint_DrawPoint(X_Center + YCurrent, Y_Center + XCurrent, Color, Line_width, DOT_STYLE_DFT);//0
+
+            if (Esp < 0 )
+                Esp += 4 * XCurrent + 6;
+            else {
+                Esp += 10 + 4 * (XCurrent - YCurrent );
+                YCurrent --;
+            }
+            XCurrent ++;
+        }
+    }
+}
+
+/******************************************************************************
+function:	Use the 8-point method to draw a circle of the
+            specified size at the specified position->
+parameter:
+    X_Center  锛欳enter X coordinate
+    Y_Center  锛欳enter Y coordinate
+    Radius    锛歝ircle Radius
+    Color     锛歍he color of the 锛歝ircle segment
+    Filled    : Whether it is filled: 1 filling 0锛欴o not
+******************************************************************************/
 void Paint_DrawCircle(  UWORD X_Center, UWORD Y_Center, UWORD Radius, 
                         UWORD Color, DOT_PIXEL Line_width, DRAW_FILL Draw_Fill )
 {
@@ -345,14 +395,14 @@ void Paint_DrawCircle(  UWORD X_Center, UWORD Y_Center, UWORD Radius,
     }
 
     //Draw a circle from(0, R) as a starting point
-    int16_t XCurrent, YCurrent;
+    WORD XCurrent, YCurrent;
     XCurrent = 0;
     YCurrent = Radius;
 
     //Cumulative error,judge the next point of the logo
-    int16_t Esp = 3 - (Radius << 1 );
+    WORD Esp = 3 - (Radius << 1 );
 
-    int16_t sCountY;
+    WORD sCountY = 0;
     if (Draw_Fill == DRAW_FILL_FULL) {
         while (XCurrent <= YCurrent ) { //Realistic circles
             for (sCountY = XCurrent; sCountY <= YCurrent; sCountY ++ ) {
@@ -415,7 +465,7 @@ void Paint_DrawChar(UWORD Xpoint, UWORD Ypoint, const char Acsii_Char,
     //Debug("Paint_DrawChar Input exceeds the normal display range\r\n");
     return;
   }
-  uint32_t Char_Offset = (Acsii_Char - ' ') * Font->Height * (Font->Width / 8 + (Font->Width % 8 ? 1 : 0));
+  UWORD Char_Offset = (Acsii_Char - ' ') * Font->Height * (Font->Width / 8 + (Font->Width % 8 ? 1 : 0));
   const unsigned char *ptr = &Font->table[Char_Offset];
 
   for ( Page = 0; Page < Font->Height; Page ++ ) {
@@ -498,11 +548,11 @@ void Paint_DrawString_EN(UWORD Xstart, UWORD Ystart, const char * pString,
     Color_Foreground : Select the foreground color of the English character
 ******************************************************************************/
 #define  ARRAY_LEN 50
-void Paint_DrawNum(UWORD Xpoint, UWORD Ypoint, int32_t Nummber,
+void Paint_DrawNum(UWORD Xpoint, UWORD Ypoint, WORD Nummber,
                    sFONT* Font, UWORD Color_Background, UWORD Color_Foreground )
 {
 
-  int16_t Num_Bit = 0, Str_Bit = 0;
+  WORD Num_Bit = 0, Str_Bit = 0;
   uint8_t Str_Array[ARRAY_LEN] = {0}, Num_Array[ARRAY_LEN] = {0};
   uint8_t *pStr = Str_Array;
 
@@ -606,5 +656,231 @@ void Paint_DrawImage(const unsigned char *image, UWORD xStart, UWORD yStart, UWO
     }
   }
 
+}
+
+
+
+/**************************************************************************/
+/*!
+  @brief  Write a perfectly horizontal line
+  @param  x       Left-most x coordinate
+  @param  y       Left-most y coordinate
+  @param  w       Width in pixels
+  @param  color   16-bit 5-6-5 Color to fill with
+*/
+/**************************************************************************/
+void Paint_HLine(UWORD x, UWORD y,UWORD w, UWORD color)
+{
+  for (WORD i = x; i < x + w; i++)
+  {
+    Paint_SetPixel(i, y, color);
+  }
+}
+
+
+#define PI 3.141592653f
+#define DEGTORAD (PI / 180.0f)
+
+
+/**************************************************************************/
+/*!
+  @brief  Arc drawer with fill
+  @param  cx      Center-point x coordinate
+  @param  cy      Center-point y coordinate
+  @param  oradius Outer radius of arc
+  @param  iradius Inner radius of arc
+  @param  start   degree of arc start
+  @param  end     degree of arc end
+  @param  color   16-bit 5-6-5 Color to fill with
+*/
+/**************************************************************************/
+void writeFillArcHelper(UWORD cx, WORD cy, WORD oradius, WORD iradius, float start, float end, UWORD color)
+{
+  if ((start == 90.0) || (start == 180.0) || (start == 270.0) || (start == 360.0))
+  {
+    start -= 0.1;
+  }
+
+  if ((end == 90.0) || (end == 180.0) || (end == 270.0) || (end == 360.0))
+  {
+    end -= 0.1;
+  }
+
+  float s_cos = (cos(start * DEGTORAD));
+  float e_cos = (cos(end * DEGTORAD));
+  float sslope = s_cos / (sin(start * DEGTORAD));
+  float eslope = e_cos / (sin(end * DEGTORAD));
+  float swidth = 0.5 / s_cos;
+  float ewidth = -0.5 / e_cos;
+  --iradius;
+  WORD ir2 = iradius * iradius + iradius;
+  WORD or2 = oradius * oradius + oradius;
+
+  bool start180 = !(start < 180.0);
+  bool end180 = end < 180.0;
+  bool reversed = start + 180.0 < end || (end < start && start < end + 180.0);
+
+  WORD xs = -oradius;
+  WORD y = -oradius;
+  WORD ye = oradius;
+  WORD xe = oradius + 1;
+  if (!reversed)
+  {
+    if ((end >= 270 || end < 90) && (start >= 270 || start < 90))
+    {
+      xs = 0;
+    }
+    else if (end < 270 && end >= 90 && start < 270 && start >= 90)
+    {
+      xe = 1;
+    }
+    if (end >= 180 && start >= 180)
+    {
+      ye = 0;
+    }
+    else if (end < 180 && start < 180)
+    {
+      y = 0;
+    }
+  }
+  do
+  {
+    WORD y2 = y * y;
+    WORD x = xs;
+    if (x < 0)
+    {
+      while (x * x + y2 >= or2)
+      {
+        ++x;
+      }
+      if (xe != 1)
+      {
+        xe = 1 - x;
+      }
+    }
+    float ysslope = (y + swidth) * sslope;
+    float yeslope = (y + ewidth) * eslope;
+    WORD len = 0;
+    do
+    {
+      bool flg1 = start180 != (x <= ysslope);
+      bool flg2 = end180 != (x <= yeslope);
+      WORD distance = x * x + y2;
+      if (distance >= ir2 && ((flg1 && flg2) || (reversed && (flg1 || flg2))) && x != xe && distance < or2)
+      {
+        ++len;
+      }
+      else
+      {
+        if (len)
+        {
+          Paint_HLine(cx + x - len, cy + y, len, color);
+          len = 0;
+        }
+        if (distance >= or2)
+          break;
+        if (x < 0 && distance < ir2)
+        {
+          x = -x;
+        }
+      }
+    } while (++x <= xe);
+  } while (++y <= ye);
+}
+
+/**************************************************************************/
+/*!
+  @brief  Draw an arc outline
+  @param  x       Center-point x coordinate
+  @param  y       Center-point y coordinate
+  @param  r1      Outer radius of arc
+  @param  r2      Inner radius of arc
+  @param  start   degree of arc start
+  @param  end     degree of arc end
+  @param  color   16-bit 5-6-5 Color to draw with
+*/
+/**************************************************************************/
+void Paint_drawArc1(WORD x, WORD y, WORD r1, WORD r2, float start, float end, UWORD color)
+{
+  if (r1 < r2)
+  {
+    WORD t = r1;
+    r1 = r2;
+    r2 = t;
+  }
+  if (r1 < 1)
+  {
+    r1 = 1;
+  }
+  if (r2 < 1)
+  {
+    r2 = 1;
+  }
+  bool equal = fabsf(start - end) < FLT_EPSILON;
+  start = fmodf(start, 360);
+  end = fmodf(end, 360);
+  if (start < 0)
+    start += 360.0;
+  if (end < 0)
+    end += 360.0;
+
+//  startWrite();
+  writeFillArcHelper(x, y, r1, r2, start, start, color);
+  writeFillArcHelper(x, y, r1, r2, end, end, color);
+  if (!equal && (fabsf(start - end) <= 0.0001))
+  {
+    start = .0;
+    end = 360.0;
+  }
+  writeFillArcHelper(x, y, r1, r1, start, end, color);
+  writeFillArcHelper(x, y, r2, r2, start, end, color);
+//  endWrite();
+}
+
+/**************************************************************************/
+/*!
+  @brief  Draw an arc with filled color
+  @param  x       Center-point x coordinate
+  @param  y       Center-point y coordinate
+  @param  r1      Outer radius of arc
+  @param  r2      Inner radius of arc
+  @param  start   degree of arc start
+  @param  end     degree of arc end
+  @param  color   16-bit 5-6-5 Color to fill with
+*/
+/**************************************************************************/
+void Paint_fillArc(WORD x, WORD y, WORD r1, WORD r2, float start, float end, UWORD color)
+{
+  if (r1 < r2)
+  {
+    WORD t = r1;
+    r1 = r2;
+    r2 = t;
+    //_swap_WORD(r1, r2);
+  }
+  if (r1 < 1)
+  {
+    r1 = 1;
+  }
+  if (r2 < 1)
+  {
+    r2 = 1;
+  }
+  bool equal = fabsf(start - end) < FLT_EPSILON;
+  start = fmodf(start, 360);
+  end = fmodf(end, 360);
+  if (start < 0)
+    start += 360.0;
+  if (end < 0)
+    end += 360.0;
+  if (!equal && (fabsf(start - end) <= 0.0001))
+  {
+    start = .0;
+    end = 360.0;
+  }
+
+  //startWrite();
+  writeFillArcHelper(x, y, r1, r2, start, end, color);
+  //endWrite();
 }
 
