@@ -1,16 +1,17 @@
 
-#include <Arduino.h>
+#ifndef ASIM
+    #include <Arduino.h>
+#endif
 
-
-extern void sk_setup();
-extern void sk_loop();
-extern void sk1_loop();
+extern void sketch_setup();
+extern void sketch_loop();
+extern void sketch_loop1();
 
 void setup() {
 
     Serial.begin(9600);
     Serial.print("Setup... ");
-    //sk_setup();
+    //sketch_setup();
     Serial.println("done.");
 }
 
@@ -29,5 +30,5 @@ void loop() {
     }
     draws += 1;
 //    sk_loop();
-    sk1_loop();
+    sketch_loop1();
 }

@@ -8,8 +8,8 @@
 #include "LCD_Driver.h"
 
 
-extern void setup();
-extern void loop();
+extern void sketch_setup();
+extern void sketch_loop();
 
 int main()
 {
@@ -30,13 +30,13 @@ int main()
     SetTraceLogLevel(LOG_ERROR); 
     InitWindow(screen_width, screen_height, "ASIM window");
 
-    setup();
+    sketch_setup();
 
     SetTargetFPS(60);
 
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
-        loop();
+        sketch_loop();
         BeginDrawing();
             //ClearBackground(RAYWHITE);
             Texture2D texture = LoadTextureFromImage(img);

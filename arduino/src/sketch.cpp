@@ -1,4 +1,7 @@
-#include <Arduino.h>
+
+#ifndef ASIM
+    #include <Arduino.h>
+#endif
 #include "LCD_Driver.h"
 #include "GUI_Paint.h"
 #include "image_70x70.h"
@@ -126,7 +129,7 @@ void setVolume(uint8_t level)
     prev_angle = ea;
 }
 
-void sk_setup()
+void sketch_setup()
 {
 
     // Config_Init();
@@ -147,7 +150,7 @@ int level = 40;
 bool up = true;
 
 
-void sk1_loop(){
+void sketch_loop1(){
 
     if ( level ==0) {
         level = 99;
@@ -158,7 +161,7 @@ void sk1_loop(){
 
 }
 
-void sk_loop()
+void sketch_loop()
 {
     // int num = (loopCount / 100 ) %9;
 

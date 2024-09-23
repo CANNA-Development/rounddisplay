@@ -1,7 +1,7 @@
-CC=g++ -D ASIM=1 -c -Wall -Wextra -I. -I./gfx_lib 
+CC=g++ -D ASIM=1 -c -Wall -Wextra -I. -I./arduino/src 
 all: bin/asim
 
-bin/%.o: ./gfx_lib/%.cpp
+bin/%.o: ./arduino/src/%.cpp
 	$(CC) -o $@ $^
 
 bin/%.o: ./%.cpp
