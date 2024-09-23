@@ -1,10 +1,10 @@
 CC=g++ -D ASIM=1 -c -Wall -Wextra -I. -I./gfx_lib 
 all: bin/asim
 
-bin/%.o: ./gfx_lib/%.c
+bin/%.o: ./gfx_lib/%.cpp
 	$(CC) -o $@ $^
 
-bin/%.o: ./%.c
+bin/%.o: ./%.cpp
 	$(CC) -o $@ $^
 
 
