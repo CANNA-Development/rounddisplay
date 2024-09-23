@@ -3,6 +3,7 @@
         "dev_config.h": "c",
         "lcd_driver.h": "c",
         "cstdint": "cpp",
-        "fonts.h": "c"
+        "fonts.h": "c",
+        "gui_paint.h": "c"
     }
 }

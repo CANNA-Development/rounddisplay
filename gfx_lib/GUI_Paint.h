@@ -39,6 +39,9 @@
 #include "fonts.h"
 #include "Debug.h"
 
+#ifndef pgm_read_byte
+  #define pgm_read_byte(x) (*(x))
+#endif
 
 //#include <avr/pgmspace.h>
 /**
@@ -77,10 +80,12 @@ typedef enum {
 } MIRROR_IMAGE;
 #define MIRROR_IMAGE_DFT MIRROR_NONE
 
+
+
 /**
  * image color
 **/
-
+#define DARKBLUE      0X01CF
 #define WHITE         0xFFFF
 #define BLACK         0x0000    
 #define BLUE          0x001F  
@@ -181,9 +186,9 @@ void Paint_HLine(UWORD x, UWORD y, UWORD w, UWORD color);
 
 //Display string
 void Paint_DrawChar(UWORD Xstart, UWORD Ystart, const char Acsii_Char, sFONT* Font, UWORD Color_Background, UWORD Color_Foreground);
-void Paint_DrawString_EN(UWORD Xstart, UWORD Ystart, const char * pString, sFONT* Font, UWORD Color_Background, UWORD Color_Foreground);
-void Paint_DrawNum(UWORD Xpoint, UWORD Ypoint, int32_t Nummber, sFONT* Font, UWORD Color_Background, UWORD Color_Foreground);
-//void Paint_DrawFloatNum(UWORD Xpoint, UWORD Ypoint, double Nummber,  UBYTE Decimal_Point, sFONT* Font, UWORD Color_Background, UWORD Color_Foreground);
+void Paint_DrawString(UWORD Xstart, UWORD Ystart, const char * pString, sFONT* Font, UWORD Color_Background, UWORD Color_Foreground);
+void Paint_DrawNum(UWORD Xpoint, UWORD Ypoint, WORD Nummber,sFONT* Font, UWORD Color_Background, UWORD Color_Foreground );
+
 void Paint_DrawTime(UWORD Xstart, UWORD Ystart, PAINT_TIME *pTime, sFONT* Font, UWORD Color_Background, UWORD Color_Foreground);
 
 void Paint_fillArc(WORD x, WORD y, WORD r1, WORD r2, float start, float end, UWORD color);
