@@ -176,7 +176,7 @@ void LCD_Init(void)
 	LCD_WriteData_Byte(0x20);
 
 	LCD_WriteReg(0x36);
-	LCD_WriteData_Byte(0x08);//璁剧疆涓虹珫灞�
+	LCD_WriteData_Byte(0x08);
 
 	LCD_WriteReg(0x3A);			
 	LCD_WriteData_Byte(0x05); 
@@ -459,4 +459,5 @@ void LCD_SetUWORD(UWORD x, UWORD y, UWORD Color)
   LCD_SetCursor(x,y,x,y);
   LCD_WriteData_Word(Color);      
 } 
+
 

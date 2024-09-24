@@ -11,7 +11,7 @@ void setup() {
 
     Serial.begin(9600);
     Serial.print("Setup... ");
-    //sketch_setup();
+    sketch_setup();
     Serial.println("done.");
 }
 
@@ -30,5 +30,5 @@ void loop() {
     }
     draws += 1;
 //    sk_loop();
-    sketch_loop1();
+    sketch_loop();
 }

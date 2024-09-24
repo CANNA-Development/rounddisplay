@@ -54,33 +54,10 @@ typedef struct {
     UWORD WidthMemory;
     UWORD HeightMemory;
     UWORD Color;
-    UWORD Rotate;
-    UWORD Mirror;
     UWORD WidthByte;
     UWORD HeightByte;
 } PAINT;
 extern volatile PAINT Paint;
-
-/**
- * Display rotate
-**/
-#define ROTATE_0            0
-#define ROTATE_90           90
-#define ROTATE_180          180
-#define ROTATE_270          270
-
-/**
- * Display Flip
-**/
-typedef enum {
-    MIRROR_NONE  = 0x00,
-    MIRROR_HORIZONTAL = 0x01,
-    MIRROR_VERTICAL = 0x02,
-    MIRROR_ORIGIN = 0x03,
-} MIRROR_IMAGE;
-#define MIRROR_IMAGE_DFT MIRROR_NONE
-
-
 
 /**
  * image color
@@ -167,11 +144,9 @@ typedef struct {
 extern PAINT_TIME sPaint_time;
 
 //init and Clear
-void Paint_NewImage(UWORD Width, UWORD Height, UWORD Rotate, UWORD Color);
+void Paint_NewImage(UWORD Width, UWORD Height,UWORD Color);
 void Paint_SelectImage(UBYTE *image);
-void Paint_SetRotate(UWORD Rotate);
-void Paint_SetMirroring(UBYTE mirror);
-void Paint_SetPixel(UWORD Xpoint, UWORD Ypoint, UWORD Color);
+void Paint_SetPixel(UWORD x, UWORD y, UWORD color);
 
 void Paint_Clear(UWORD Color);
 void Paint_ClearWindows(UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD Yend, UWORD Color);

@@ -26,8 +26,9 @@ void Paint_Digit(UWORD xp, UWORD yp, const uint8_t digit, const sFONT *font, UWO
 {
 
     UWORD offset = (digit + '0' - ' ') * font->Height * (font->Width / 8 + (font->Width % 8 ? 1 : 0));
-    const unsigned char *ptr = &font->table[offset];
+    const uint8_t *ptr = &font->table[offset];
 
+    LCD_SetCursor(xp,yp,xp + font->Width,yp + font->Height);
     for (UWORD page = 0; page < font->Height; page++)
     {
         for (UWORD column = 0; column < font->Width; column++)
@@ -35,11 +36,13 @@ void Paint_Digit(UWORD xp, UWORD yp, const uint8_t digit, const sFONT *font, UWO
 
             if (pgm_read_byte(ptr) & (0x80 >> (column % 8)))
             {
-                Paint_SetPixel(xp + column, yp + page, fcol);
+                //Paint_SetPixel(xp + column, yp + page, fcol);
+                LCD_WriteData_Word(fcol);  
             }
             else
             {
-                Paint_SetPixel(xp + column, yp + page, bcol);
+                //Paint_SetPixel(xp + column, yp + page, bcol);
+                LCD_WriteData_Word(bcol);  
             }
             // One pixel is 8 bits
             if (column % 8 == 7)
@@ -51,7 +54,7 @@ void Paint_Digit(UWORD xp, UWORD yp, const uint8_t digit, const sFONT *font, UWO
         {
             ptr++;
         }
-    } /* Write all */
+    }
 }
 
 void Paint_VolumeText(uint8_t number)
@@ -131,18 +134,16 @@ void setVolume(uint8_t level)
 
 void sketch_setup()
 {
-
-    // Config_Init();
+    #ifndef ASIM
+        Config_Init();
+    #endif
     LCD_Init();
     LCD_SetBacklight(1000);
-    Paint_NewImage(LCD_WIDTH, LCD_HEIGHT, 0, BLACK);
+
+    Paint_NewImage(LCD_WIDTH, LCD_HEIGHT, BLACK);
     Paint_Clear(BLACK);
     Paint_DrawString(LCD_WIDTH/2 - Font16.Width * 7 /2, 80, "MDesign", &Font16, BLACK, GREEN);
-    //Paint_DrawImage(image_70X70, 85, 25, 70, 70);
-    //Paint_HLine(30, 60, 240 - 60, GREEN);
-
     Paint_fillArc(LCD_WIDTH / 2, LCD_HEIGHT / 2, INNER_RADIUS, OUTER_RADIUS, BEGIN_ANGLE, END_ANGLE, RING_BCOL);
-
 }
 
 int loopCount = 0;
