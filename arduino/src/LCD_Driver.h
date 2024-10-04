@@ -44,7 +44,6 @@ void LCD_WriteData_Word(UWORD da);
 void LCD_WriteReg(UBYTE da);
 
 void LCD_SetCursor(UWORD x1, UWORD y1, UWORD x2,UWORD y2);
-void LCD_SetUWORD(UWORD x, UWORD y, UWORD Color);
 
 void LCD_Init(void);
 void LCD_SetBacklight(UWORD Value);

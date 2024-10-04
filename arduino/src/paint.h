@@ -62,7 +62,7 @@ void paintPixel(uint16_t x, uint16_t y, uint16_t color);
 void paintClear(uint16_t olor);
 void paintHorLine(uint16_t x, uint16_t y, uint16_t w, uint16_t color);
 void paintChar(uint16_t xp, uint16_t yp, const uint8_t ch, const sFONT *font, uint16_t bcol, uint16_t fcol);
-void paintString(uint16_t Xstart, uint16_t Ystart, const char * pString, sFONT* Font, uint16_t Color_Background, uint16_t Color_Foreground);
+void paintString(uint16_t xp, uint16_t up, const char * string, sFONT* Font, uint16_t bcol, uint16_t fcol);
 void paintFillArc(WORD x, WORD y, WORD r1, WORD r2, float start, float end, uint16_t color);
 
 #endif

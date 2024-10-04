@@ -447,17 +447,5 @@ void LCD_SetWindowColor(UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD Yend,UWORD
   LCD_WriteData_Word(Color);      
 }
 
-/******************************************************************************
-function: Draw a UWORD
-parameter :
-    X     :   Set the X coordinate
-    Y     :   Set the Y coordinate
-    Color :   Set the color
-******************************************************************************/
-void LCD_SetUWORD(UWORD x, UWORD y, UWORD Color)
-{
-  LCD_SetCursor(x,y,x,y);
-  LCD_WriteData_Word(Color);      
-} 
 
 

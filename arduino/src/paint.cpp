@@ -7,7 +7,7 @@
 
 #define FLT_EPSILON (1.0e-6f)
 
-//volatile PAINT Paint;
+volatile PAINT Paint;
 
 /******************************************************************************
   function: Draw Pixels
@@ -16,9 +16,10 @@
     y     :   At point Y
     color :   Painted colors
 ******************************************************************************/
-void paintSetPixel(UWORD x, UWORD y, UWORD color)
+void paintSetPixel(uint16_t x, uint16_t y, uint16_t color)
 {
-    LCD_SetUWORD(x, y, color);
+    LCD_SetCursor(x,y,x,y);
+    LCD_WriteData_Word(color);   
 }
 
 /******************************************************************************
@@ -26,12 +27,12 @@ void paintSetPixel(UWORD x, UWORD y, UWORD color)
   parameter:
     Color   :   Painted colors
 ******************************************************************************/
-void paintClear(UWORD Color)
+void paintClear(uint16_t Color)
 {
     LCD_SetCursor(0, 0, Paint.WidthByte-1, Paint.HeightByte);
-    for (UWORD Y = 0; Y < Paint.HeightByte; Y++)
+    for (uint16_t Y = 0; Y < Paint.HeightByte; Y++)
     {
-        for (UWORD X = 0; X < Paint.WidthByte; X++)
+        for (uint16_t X = 0; X < Paint.WidthByte; X++)
         { 
             LCD_WriteData_Word(Color);
         }
@@ -53,20 +54,20 @@ void paintChar(uint16_t xp, uint16_t yp, const uint8_t ch, const sFONT *font, ui
 
             if (pgm_read_byte(ptr) & (0x80 >> (column % 8)))
             {
-                //paintSetPixel(xp + column, yp + page, fcol);
                 LCD_WriteData_Word(fcol);  
             }
             else
             {
-                //paintSetPixel(xp + column, yp + page, bcol);
                 LCD_WriteData_Word(bcol);  
             }
-            // One pixel is 8 bits
+ 
             if (column % 8 == 7)
             {
                 ptr++;
             }
-        } /* Write a line */
+        }
+
+        // next line?
         if (font->Width % 8 != 0)
         {
             ptr++;
@@ -84,36 +85,13 @@ void paintChar(uint16_t xp, uint16_t yp, const uint8_t ch, const sFONT *font, ui
     bcol : Select the background color of the English character
     fcol : Select the foreground color of the English character
 ******************************************************************************/
-void paintString(uint16_t xs, uint16_t ys, const char *string, sFONT *Font, uint16_t bcol, uint16_t fcol)
+void paintString(uint16_t xp, uint16_t yp, const char *string, sFONT *Font, uint16_t bcol, uint16_t fcol)
 {
-    uint16_t Xpoint = xs;
-    uint16_t Ypoint = ys;
-
-    if (xs > Paint.Width || ys > Paint.Height)
-    {
-        return;
-    }
-
     while (string[0] != '\0')
     {
-        if ((Xpoint + Font->Width) > Paint.Width)
-        {
-            Xpoint = xs;
-            Ypoint += Font->Height;
-        }
-
-        if ((Ypoint + Font->Height) > Paint.Height)
-        {
-            Xpoint = xs;
-            Ypoint = ys;
-        }
-        paintChar(Xpoint, Ypoint, string[0], Font, bcol, fcol);
-
-        // The next character of the address
+        paintChar(xp, yp, string[0], Font, bcol, fcol);
         string++;
-
-        // The next word of the abscissa increases the font of the broadband
-        Xpoint += Font->Width;
+        xp += Font->Width;
     }
 }
 
@@ -151,7 +129,7 @@ void paintHorLine(uint16_t x, uint16_t y, uint16_t w, uint16_t color)
   @param  color   16-bit 5-6-5 Color to fill with
 */
 /**************************************************************************/
-void writeFillArcHelper(UWORD cx, WORD cy, WORD oradius, WORD iradius, float start, float end, UWORD color)
+void writeFillArcHelper(uint16_t cx, WORD cy, WORD oradius, WORD iradius, float start, float end, uint16_t color)
 {
     if ((start == 90.0) || (start == 180.0) || (start == 270.0) || (start == 360.0))
     {
@@ -258,7 +236,7 @@ void writeFillArcHelper(UWORD cx, WORD cy, WORD oradius, WORD iradius, float sta
   @param  color   16-bit 5-6-5 Color to fill with
 */
 /**************************************************************************/
-void paintFillArc(WORD x, WORD y, WORD r1, WORD r2, float start, float end, UWORD color)
+void paintFillArc(WORD x, WORD y, WORD r1, WORD r2, float start, float end, uint16_t color)
 {
     if (r1 < r2)
     {
