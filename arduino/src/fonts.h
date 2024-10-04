@@ -68,10 +68,7 @@ struct sFONT
 };
 
 extern sFONT Font24;
-extern sFONT Font20;
 extern sFONT Font16;
-extern sFONT Font12;
-extern sFONT Font8;
 
 extern const unsigned char Font16_Table[];
 
