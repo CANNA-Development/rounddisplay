@@ -28,7 +28,7 @@ void Paint_Digit(UWORD xp, UWORD yp, const uint8_t digit, const sFONT *font, UWO
     UWORD offset = (digit + '0' - ' ') * font->Height * (font->Width / 8 + (font->Width % 8 ? 1 : 0));
     const uint8_t *ptr = &font->table[offset];
 
-    LCD_SetCursor(xp,yp,xp + font->Width,yp + font->Height);
+    LCD_SetCursor(xp,yp,xp + font->Width-1,yp + font->Height-1);
     for (UWORD page = 0; page < font->Height; page++)
     {
         for (UWORD column = 0; column < font->Width; column++)

@@ -80,7 +80,7 @@ void Paint_SetPixel(UWORD x, UWORD y, UWORD color)
 ******************************************************************************/
 void Paint_Clear(UWORD Color)
 {
-    LCD_SetCursor(0, 0, Paint.WidthByte, Paint.HeightByte);
+    LCD_SetCursor(0, 0, Paint.WidthByte-1, Paint.HeightByte);
     for (UWORD Y = 0; Y < Paint.HeightByte; Y++)
     {
         for (UWORD X = 0; X < Paint.WidthByte; X++)
@@ -623,10 +623,10 @@ void Paint_DrawImage(const unsigned char *image, UWORD xs, UWORD ys, UWORD W_Ima
 /**************************************************************************/
 void Paint_HLine(UWORD x, UWORD y, UWORD w, UWORD color)
 {
-    LCD_SetCursor(x, y, x + w, y);
+    LCD_SetCursor(x, y, x + w -1, y);
     for (WORD i = x; i < x + w; i++)
     {
-        // Paint_SetPixel(i, y, color);
+        //Paint_SetPixel(i, y, color);
         LCD_WriteData_Word(color);
     }
 }
