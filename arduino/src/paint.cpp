@@ -33,16 +33,16 @@ void Paint::clear(uint16_t color)
     }
 }
 
-void Paint::character(uint16_t xp, uint16_t yp, const uint8_t ch, const sFONT *font, uint16_t bcol, uint16_t fcol)
+void Paint::character(uint16_t xp, uint16_t yp, const uint8_t ch, const FONT *font, uint16_t bcol, uint16_t fcol)
 {
 
-    uint16_t offset = (ch - ' ') * font->Height * (font->Width / 8 + (font->Width % 8 ? 1 : 0));
+    uint16_t offset = (ch - ' ') * font->height * (font->width / 8 + (font->width % 8 ? 1 : 0));
     const uint8_t *ptr = &font->table[offset];
 
-    _display.drawArea(xp, yp, xp + font->Width - 1, yp + font->Height - 1);
-    for (uint16_t page = 0; page < font->Height; page++)
+    _display.drawArea(xp, yp, xp + font->width - 1, yp + font->height - 1);
+    for (uint16_t page = 0; page < font->height; page++)
     {
-        for (uint16_t column = 0; column < font->Width; column++)
+        for (uint16_t column = 0; column < font->width; column++)
         {
 
             if (pgm_read_byte(ptr) & (0x80 >> (column % 8)))
@@ -61,7 +61,7 @@ void Paint::character(uint16_t xp, uint16_t yp, const uint8_t ch, const sFONT *f
         }
 
         // next line?
-        if (font->Width % 8 != 0)
+        if (font->width % 8 != 0)
         {
             ptr++;
         }
@@ -78,13 +78,13 @@ void Paint::character(uint16_t xp, uint16_t yp, const uint8_t ch, const sFONT *f
     bcol : Select the background color of the English character
     fcol : Select the foreground color of the English character
 ******************************************************************************/
-void Paint::string(uint16_t xp, uint16_t yp, const char *string, sFONT *Font, uint16_t bcol, uint16_t fcol)
+void Paint::string(uint16_t xp, uint16_t yp, const char *string, FONT *Font, uint16_t bcol, uint16_t fcol)
 {
     while (string[0] != '\0')
     {
         character(xp, yp, string[0], Font, bcol, fcol);
         string++;
-        xp += Font->Width;
+        xp += Font->width;
     }
 }
 
@@ -119,17 +119,17 @@ void Paint::writeFillArcHelper(uint16_t cx, uint16_t cy, uint16_t oradius, uint1
     float swidth = 0.5 / s_cos;
     float ewidth = -0.5 / e_cos;
     --iradius;
-    WORD ir2 = iradius * iradius + iradius;
-    WORD or2 = oradius * oradius + oradius;
+    int16_t ir2 = iradius * iradius + iradius;
+    int16_t or2 = oradius * oradius + oradius;
 
     bool start180 = !(start < 180.0);
     bool end180 = end < 180.0;
     bool reversed = start + 180.0 < end || (end < start && start < end + 180.0);
 
-    WORD xs = -oradius;
-    WORD y = -oradius;
-    WORD ye = oradius;
-    WORD xe = oradius + 1;
+    int16_t xs = -oradius;
+    int16_t y = -oradius;
+    int16_t ye = oradius;
+    int16_t xe = oradius + 1;
     if (!reversed)
     {
         if ((end >= 270 || end < 90) && (start >= 270 || start < 90))
@@ -151,8 +151,8 @@ void Paint::writeFillArcHelper(uint16_t cx, uint16_t cy, uint16_t oradius, uint1
     }
     do
     {
-        WORD y2 = y * y;
-        WORD x = xs;
+        int y2 = y * y;
+        int x = xs;
         if (x < 0)
         {
             while (x * x + y2 >= or2)
@@ -166,12 +166,12 @@ void Paint::writeFillArcHelper(uint16_t cx, uint16_t cy, uint16_t oradius, uint1
         }
         float ysslope = (y + swidth) * sslope;
         float yeslope = (y + ewidth) * eslope;
-        WORD len = 0;
+        int16_t len = 0;
         do
         {
             bool flg1 = start180 != (x <= ysslope);
             bool flg2 = end180 != (x <= yeslope);
-            WORD distance = x * x + y2;
+            int16_t distance = x * x + y2;
             if (distance >= ir2 && ((flg1 && flg2) || (reversed && (flg1 || flg2))) && x != xe && distance < or2)
             {
                 ++len;
@@ -198,10 +198,10 @@ void Paint::fillArc(uint16_t x, uint16_t y, uint16_t r1, uint16_t r2, float star
 {
     if (r1 < r2)
     {
-        WORD t = r1;
+        int16_t t = r1;
         r1 = r2;
         r2 = t;
-        //_swap_WORD(r1, r2);
+        //_swap_int(r1, r2);
     }
     if (r1 < 1)
     {

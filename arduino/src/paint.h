@@ -2,7 +2,7 @@
 #define PAINT_H
 
 #include "DisplayDriver.h"
-#include "DEV_Config.h"
+//#include "DEV_Config.h"
 //#include "LCD_Driver.h"
 #include "fonts.h"
 #include "Debug.h"
@@ -51,8 +51,8 @@ public:
     void setPixel(uint16_t x, uint16_t y, uint16_t color);
     void clear(uint16_t olor);
     void horizontalLine(uint16_t x, uint16_t y, uint16_t w, uint16_t color);
-    void character(uint16_t xp, uint16_t yp, const uint8_t ch, const sFONT *font, uint16_t bcol, uint16_t fcol);
-    void string(uint16_t xp, uint16_t up, const char *string, sFONT *Font, uint16_t bcol, uint16_t fcol);
+    void character(uint16_t xp, uint16_t yp, const uint8_t ch, const FONT *font, uint16_t bcol, uint16_t fcol);
+    void string(uint16_t xp, uint16_t up, const char *string, FONT *Font, uint16_t bcol, uint16_t fcol);
     void fillArc(uint16_t x, uint16_t y, uint16_t r1, uint16_t r2, float start, float end, uint16_t color);
 
 private:

@@ -1754,7 +1754,7 @@ const unsigned char Font16_Table[] PROGMEM =
   0x00, 0x00, //            
 };
 
-sFONT Font16 = {
+FONT Font16 = {
   Font16_Table,
   11, /* Width */
   16, /* Height */

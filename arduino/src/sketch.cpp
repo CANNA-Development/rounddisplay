@@ -1,9 +1,12 @@
 
 #ifndef ASIM
     #include <Arduino.h>
+    #include "LcdDriver.h"
+#else
+    #include "AsimDriver.h"
 #endif
 
-#include "LcdDriver.h"
+
 #include "paint.h"
 #include "fonts.h"
 
@@ -19,10 +22,18 @@ static const uint16_t FONT_OFFSET = 10;
 static const uint16_t INNER_RADIUS = 90;
 static const uint16_t OUTER_RADIUS = 110;
 
+static const uint8_t LCD_DC_PIN  = 7;
+static const uint8_t  LCD_RST_PIN = 8;
+
 
 static float prev_angle = BEGIN_ANGLE;
 
-static LcdDriver driver;
+#ifdef ASIM
+    static AsimDriver driver;
+#else
+    static LcdDriver driver(LCD_RST_PIN, LCD_DC_PIN);
+#endif
+
 static Paint paint(driver);
 
 void paintVolumeText(uint8_t number)
@@ -32,43 +43,43 @@ void paintVolumeText(uint8_t number)
 
     static uint8_t prev_number = 0;
 
-    const sFONT *font = &Font24;
-    uint16_t yp = driver.height() / 2 - font->Height / 2;
+    const FONT *font = &Font24;
+    uint16_t yp = driver.height() / 2 - font->height / 2;
 
     uint8_t d0 = (number % 10);
 
     if ((prev_number > 99) && (number < 100))
     {
-        for (uint16_t y = yp; y < yp + font->Height; y++)
+        for (uint16_t y = yp; y < yp + font->height; y++)
         {
-            paint.horizontalLine(driver.width() / 2 - font->Width * 3 / 2, y, font->Width / 2 + 1, bcol);
-            paint.horizontalLine(driver.width() / 2 + font->Width, y, font->Width / 2 + 1, bcol);
+            paint.horizontalLine(driver.width() / 2 - font->width * 3 / 2, y, font->width / 2 + 1, bcol);
+            paint.horizontalLine(driver.width() / 2 + font->width, y, font->width / 2 + 1, bcol);
         }
     }
     else if ((prev_number > 9) && (number < 10))
     {
-        for (WORD y = yp; y < yp + font->Height; y++)
+        for (uint16_t y = yp; y < yp + font->height; y++)
         {
-            paint.horizontalLine(driver.width() / 2 - font->Width, y, font->Width / 2 + 1, bcol);
-            paint.horizontalLine(driver.width() / 2 + font->Width / 2, y, font->Width / 2 + 1, bcol);
+            paint.horizontalLine(driver.width() / 2 - font->width, y, font->width / 2 + 1, bcol);
+            paint.horizontalLine(driver.width() / 2 + font->width / 2, y, font->width / 2 + 1, bcol);
         }
     }
 
     if (number < 10)
     {
-        paint.character(driver.width() / 2 - font->Width / 2, yp, d0 + '0', font, bcol, fcol);
+        paint.character(driver.width() / 2 - font->width / 2, yp, d0 + '0', font, bcol, fcol);
     }
     else if (number < 100)
     {
         uint8_t d1 = ((number / 10) % 10);
-        paint.character(driver.width() / 2 - font->Width, yp, d1 + '0', font, bcol, fcol);
+        paint.character(driver.width() / 2 - font->width, yp, d1 + '0', font, bcol, fcol);
         paint.character(driver.width() / 2, yp, d0 + '0', font, bcol, fcol);
     }
     else
     {
-        paint.character(driver.width() / 2 - font->Width * 3 / 2, yp, '1', font, bcol, fcol);
-        paint.character(driver.width() / 2 - font->Width * 1 / 2, yp, '0', font, bcol, fcol);
-        paint.character(driver.width() / 2 + font->Width * 1 / 2, yp, '0', font, bcol, fcol);
+        paint.character(driver.width() / 2 - font->width * 3 / 2, yp, '1', font, bcol, fcol);
+        paint.character(driver.width() / 2 - font->width * 1 / 2, yp, '0', font, bcol, fcol);
+        paint.character(driver.width() / 2 + font->width * 1 / 2, yp, '0', font, bcol, fcol);
     }
     prev_number = number;
 
@@ -95,11 +106,11 @@ void setVolume(uint8_t level)
 void sketch_setup()
 {
     #ifndef ASIM
-        Config_Init();
+      //  Config_Init();
     #endif
 
     paint.init();
-    paint.string(driver.width()/2 - Font16.Width * 7 /2, 80, "MDesign", &Font16, Paint::BLACK, Paint::GREEN);
+    paint.string(driver.width()/2 - Font16.width * 7 /2, 80, "MDesign", &Font16, Paint::BLACK, Paint::GREEN);
     paint.fillArc(driver.width() / 2, driver.height() / 2, INNER_RADIUS, OUTER_RADIUS, BEGIN_ANGLE, END_ANGLE, RING_BCOL);
 }
 
