@@ -1,8 +1,9 @@
 #ifndef PAINT_H
 #define PAINT_H
 
+#include "DisplayDriver.h"
 #include "DEV_Config.h"
-#include "LCD_Driver.h"
+//#include "LCD_Driver.h"
 #include "fonts.h"
 #include "Debug.h"
 
@@ -45,7 +46,7 @@ public:
     static const uint16_t BLACK = 0x0000;
     static const uint16_t GREEN = 0x07E0;
 
-    Paint(uint16_t width, uint16_t height);
+    Paint(DisplayDriver& _display);
     void init();
     void setPixel(uint16_t x, uint16_t y, uint16_t color);
     void clear(uint16_t olor);
@@ -57,8 +58,7 @@ public:
 private:
     void writeFillArcHelper(uint16_t cx, uint16_t cy, uint16_t oradius, uint16_t iradius, float start, float end, uint16_t color);
 
-    uint16_t _width;
-    uint16_t _height;
+    DisplayDriver& _display;
 };
 
 #endif

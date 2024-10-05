@@ -31,23 +31,32 @@
 #define __LCD_DRIVER_H
 
 #include "DEV_Config.h"
+#include "DisplayDriver.h"
 
-#define LCD_WIDTH (240) //LCD width
-#define LCD_HEIGHT (240) //LCD height
+
+class LcdDriver : public DisplayDriver
+{
+public:	
+	LcdDriver();
+	void init();
+	void drawArea(uint16_t x, uint16_t y, uint16_t w, uint16_t h);
+	void write(uint16_t color) {writeWord(color);};	
+	uint16_t height() const {return LCD_WIDTH;};
+	uint16_t width() const {return LCD_HEIGHT;};
+
+private:
+	static const uint16_t LCD_WIDTH =  240;
+	static const uint16_t LCD_HEIGHT =  240;
+
+	void writeRegister(uint8_t da);
+	void writeWord(uint16_t da);
+	void writeByte(uint8_t da); 
+
+};
 
 #ifdef ASIM
-	extern UWORD asim_buffer[LCD_WIDTH*LCD_HEIGHT];
+	extern UWORD asim_buffer[240*240];
 #endif
-
-void LCD_WriteData_Byte(UBYTE da); 
-void LCD_WriteData_Word(UWORD da);
-void LCD_WriteReg(UBYTE da);
-
-void LCD_SetCursor(UWORD x1, UWORD y1, UWORD x2,UWORD y2);
-
-void LCD_Init(void);
-void LCD_Clear(UWORD Color);
-void LCD_ClearWindow(UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD Yend, UWORD UWORD);
 
 #endif
 

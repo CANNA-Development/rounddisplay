@@ -1,5 +1,4 @@
 #include "paint.h"
-#include "DEV_Config.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h> //memset()
@@ -8,29 +7,29 @@
 #define FLT_EPSILON (1.0e-6f)
 
 
-Paint::Paint(uint16_t width, uint16_t height)
-    : _width(width), _height(height)
+Paint::Paint( DisplayDriver& display)
+    : _display(display)
 {
 }
 
 void Paint::init()
 {
-    LCD_Init();
+    _display.init();
     clear(BLACK);
 }
 
 void Paint::setPixel(uint16_t x, uint16_t y, uint16_t color)
 {
-    LCD_SetCursor(x, y, x, y);
-    LCD_WriteData_Word(color);
+    _display.drawArea(x, y, x, y);
+    _display.write(color);
 }
 
 
 void Paint::clear(uint16_t color)
 {
-    for (uint16_t y = 0; y < _width; y++)
+    for (uint16_t y = 0; y < _display.height(); y++)
     {
-        horizontalLine(0, y, _width, color);
+        horizontalLine(0, y, _display.width(), color);
     }
 }
 
@@ -40,7 +39,7 @@ void Paint::character(uint16_t xp, uint16_t yp, const uint8_t ch, const sFONT *f
     uint16_t offset = (ch - ' ') * font->Height * (font->Width / 8 + (font->Width % 8 ? 1 : 0));
     const uint8_t *ptr = &font->table[offset];
 
-    LCD_SetCursor(xp, yp, xp + font->Width - 1, yp + font->Height - 1);
+    _display.drawArea(xp, yp, xp + font->Width - 1, yp + font->Height - 1);
     for (uint16_t page = 0; page < font->Height; page++)
     {
         for (uint16_t column = 0; column < font->Width; column++)
@@ -48,11 +47,11 @@ void Paint::character(uint16_t xp, uint16_t yp, const uint8_t ch, const sFONT *f
 
             if (pgm_read_byte(ptr) & (0x80 >> (column % 8)))
             {
-                LCD_WriteData_Word(fcol);
+                _display.write(fcol);
             }
             else
             {
-                LCD_WriteData_Word(bcol);
+                _display.write(bcol);
             }
 
             if (column % 8 == 7)
@@ -91,10 +90,10 @@ void Paint::string(uint16_t xp, uint16_t yp, const char *string, sFONT *Font, ui
 
 void Paint::horizontalLine(uint16_t x, uint16_t y, uint16_t w, uint16_t color)
 {
-    LCD_SetCursor(x, y, x + w - 1, y);
+    _display.drawArea(x, y, x + w - 1, y);
     for (uint16_t i = x; i < x + w; i++)
     {
-        LCD_WriteData_Word(color);
+        _display.write(color);
     }
 }
 

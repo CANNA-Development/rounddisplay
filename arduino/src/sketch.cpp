@@ -3,7 +3,7 @@
     #include <Arduino.h>
 #endif
 
-#include "LCD_Driver.h"
+#include "LcdDriver.h"
 #include "paint.h"
 #include "fonts.h"
 
@@ -22,18 +22,18 @@ static const uint16_t OUTER_RADIUS = 110;
 
 static float prev_angle = BEGIN_ANGLE;
 
-static Paint paint(LCD_WIDTH, LCD_HEIGHT);
+static LcdDriver driver;
+static Paint paint(driver);
 
 void paintVolumeText(uint8_t number)
 {
-
     const uint16_t bcol = Paint::BLACK;
     const uint16_t fcol = Paint::GREEN;
 
     static uint8_t prev_number = 0;
 
     const sFONT *font = &Font24;
-    uint16_t yp = LCD_HEIGHT / 2 - font->Height / 2;
+    uint16_t yp = driver.height() / 2 - font->Height / 2;
 
     uint8_t d0 = (number % 10);
 
@@ -41,34 +41,34 @@ void paintVolumeText(uint8_t number)
     {
         for (uint16_t y = yp; y < yp + font->Height; y++)
         {
-            paint.horizontalLine(LCD_WIDTH / 2 - font->Width * 3 / 2, y, font->Width / 2 + 1, bcol);
-            paint.horizontalLine(LCD_WIDTH / 2 + font->Width, y, font->Width / 2 + 1, bcol);
+            paint.horizontalLine(driver.width() / 2 - font->Width * 3 / 2, y, font->Width / 2 + 1, bcol);
+            paint.horizontalLine(driver.width() / 2 + font->Width, y, font->Width / 2 + 1, bcol);
         }
     }
     else if ((prev_number > 9) && (number < 10))
     {
         for (WORD y = yp; y < yp + font->Height; y++)
         {
-            paint.horizontalLine(LCD_WIDTH / 2 - font->Width, y, font->Width / 2 + 1, bcol);
-            paint.horizontalLine(LCD_WIDTH / 2 + font->Width / 2, y, font->Width / 2 + 1, bcol);
+            paint.horizontalLine(driver.width() / 2 - font->Width, y, font->Width / 2 + 1, bcol);
+            paint.horizontalLine(driver.width() / 2 + font->Width / 2, y, font->Width / 2 + 1, bcol);
         }
     }
 
     if (number < 10)
     {
-        paint.character(LCD_WIDTH / 2 - font->Width / 2, yp, d0 + '0', font, bcol, fcol);
+        paint.character(driver.width() / 2 - font->Width / 2, yp, d0 + '0', font, bcol, fcol);
     }
     else if (number < 100)
     {
         uint8_t d1 = ((number / 10) % 10);
-        paint.character(LCD_WIDTH / 2 - font->Width, yp, d1 + '0', font, bcol, fcol);
-        paint.character(LCD_WIDTH / 2, yp, d0 + '0', font, bcol, fcol);
+        paint.character(driver.width() / 2 - font->Width, yp, d1 + '0', font, bcol, fcol);
+        paint.character(driver.width() / 2, yp, d0 + '0', font, bcol, fcol);
     }
     else
     {
-        paint.character(LCD_WIDTH / 2 - font->Width * 3 / 2, yp, '1', font, bcol, fcol);
-        paint.character(LCD_WIDTH / 2 - font->Width * 1 / 2, yp, '0', font, bcol, fcol);
-        paint.character(LCD_WIDTH / 2 + font->Width * 1 / 2, yp, '0', font, bcol, fcol);
+        paint.character(driver.width() / 2 - font->Width * 3 / 2, yp, '1', font, bcol, fcol);
+        paint.character(driver.width() / 2 - font->Width * 1 / 2, yp, '0', font, bcol, fcol);
+        paint.character(driver.width() / 2 + font->Width * 1 / 2, yp, '0', font, bcol, fcol);
     }
     prev_number = number;
 
@@ -81,11 +81,11 @@ void setVolume(uint8_t level)
 
     if (ea > prev_angle)
     {
-        paint.fillArc(LCD_WIDTH / 2, LCD_HEIGHT / 2, INNER_RADIUS, OUTER_RADIUS, prev_angle - 0.1f, ea, RING_FCOL);
+        paint.fillArc(driver.width() / 2, driver.height() / 2, INNER_RADIUS, OUTER_RADIUS, prev_angle - 0.1f, ea, RING_FCOL);
     }
     else
     {
-        paint.fillArc(LCD_WIDTH / 2, LCD_HEIGHT / 2, INNER_RADIUS, OUTER_RADIUS, ea - 0.1f, prev_angle, RING_BCOL);
+        paint.fillArc(driver.width() / 2, driver.height() / 2, INNER_RADIUS, OUTER_RADIUS, ea - 0.1f, prev_angle, RING_BCOL);
     }
 
     paintVolumeText(level);
@@ -99,8 +99,8 @@ void sketch_setup()
     #endif
 
     paint.init();
-    paint.string(LCD_WIDTH/2 - Font16.Width * 7 /2, 80, "MDesign", &Font16, Paint::BLACK, Paint::GREEN);
-    paint.fillArc(LCD_WIDTH / 2, LCD_HEIGHT / 2, INNER_RADIUS, OUTER_RADIUS, BEGIN_ANGLE, END_ANGLE, RING_BCOL);
+    paint.string(driver.width()/2 - Font16.Width * 7 /2, 80, "MDesign", &Font16, Paint::BLACK, Paint::GREEN);
+    paint.fillArc(driver.width() / 2, driver.height() / 2, INNER_RADIUS, OUTER_RADIUS, BEGIN_ANGLE, END_ANGLE, RING_BCOL);
 }
 
 int loopCount = 0;
