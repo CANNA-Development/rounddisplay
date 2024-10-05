@@ -7,46 +7,40 @@
 
 #define FLT_EPSILON (1.0e-6f)
 
-volatile PAINT Paint;
 
-/******************************************************************************
-  function: Draw Pixels
-  parameter:
-    x     :   At point X
-    y     :   At point Y
-    color :   Painted colors
-******************************************************************************/
-void paintSetPixel(uint16_t x, uint16_t y, uint16_t color)
+Paint::Paint(uint16_t width, uint16_t height)
+    : _width(width), _height(height)
 {
-    LCD_SetCursor(x,y,x,y);
-    LCD_WriteData_Word(color);   
 }
 
-/******************************************************************************
-  function: Clear the color of the picture
-  parameter:
-    Color   :   Painted colors
-******************************************************************************/
-void paintClear(uint16_t Color)
+void Paint::init()
 {
-    LCD_SetCursor(0, 0, Paint.WidthByte-1, Paint.HeightByte);
-    for (uint16_t Y = 0; Y < Paint.HeightByte; Y++)
+    LCD_Init();
+    clear(BLACK);
+}
+
+void Paint::setPixel(uint16_t x, uint16_t y, uint16_t color)
+{
+    LCD_SetCursor(x, y, x, y);
+    LCD_WriteData_Word(color);
+}
+
+
+void Paint::clear(uint16_t color)
+{
+    for (uint16_t y = 0; y < _width; y++)
     {
-        for (uint16_t X = 0; X < Paint.WidthByte; X++)
-        { 
-            LCD_WriteData_Word(Color);
-        }
+        horizontalLine(0, y, _width, color);
     }
 }
 
-
-void paintChar(uint16_t xp, uint16_t yp, const uint8_t ch, const sFONT *font, uint16_t bcol, uint16_t fcol)
+void Paint::character(uint16_t xp, uint16_t yp, const uint8_t ch, const sFONT *font, uint16_t bcol, uint16_t fcol)
 {
 
     uint16_t offset = (ch - ' ') * font->Height * (font->Width / 8 + (font->Width % 8 ? 1 : 0));
     const uint8_t *ptr = &font->table[offset];
 
-    LCD_SetCursor(xp,yp,xp + font->Width-1,yp + font->Height-1);
+    LCD_SetCursor(xp, yp, xp + font->Width - 1, yp + font->Height - 1);
     for (uint16_t page = 0; page < font->Height; page++)
     {
         for (uint16_t column = 0; column < font->Width; column++)
@@ -54,13 +48,13 @@ void paintChar(uint16_t xp, uint16_t yp, const uint8_t ch, const sFONT *font, ui
 
             if (pgm_read_byte(ptr) & (0x80 >> (column % 8)))
             {
-                LCD_WriteData_Word(fcol);  
+                LCD_WriteData_Word(fcol);
             }
             else
             {
-                LCD_WriteData_Word(bcol);  
+                LCD_WriteData_Word(bcol);
             }
- 
+
             if (column % 8 == 7)
             {
                 ptr++;
@@ -85,29 +79,19 @@ void paintChar(uint16_t xp, uint16_t yp, const uint8_t ch, const sFONT *font, ui
     bcol : Select the background color of the English character
     fcol : Select the foreground color of the English character
 ******************************************************************************/
-void paintString(uint16_t xp, uint16_t yp, const char *string, sFONT *Font, uint16_t bcol, uint16_t fcol)
+void Paint::string(uint16_t xp, uint16_t yp, const char *string, sFONT *Font, uint16_t bcol, uint16_t fcol)
 {
     while (string[0] != '\0')
     {
-        paintChar(xp, yp, string[0], Font, bcol, fcol);
+        character(xp, yp, string[0], Font, bcol, fcol);
         string++;
         xp += Font->Width;
     }
 }
 
-
-/**************************************************************************/
-/*!
-  @brief  Write a perfectly horizontal line
-  @param  x       Left-most x coordinate
-  @param  y       Left-most y coordinate
-  @param  w       Width in pixels
-  @param  color   16-bit 5-6-5 Color to fill with
-*/
-/**************************************************************************/
-void paintHorLine(uint16_t x, uint16_t y, uint16_t w, uint16_t color)
+void Paint::horizontalLine(uint16_t x, uint16_t y, uint16_t w, uint16_t color)
 {
-    LCD_SetCursor(x, y, x + w -1, y);
+    LCD_SetCursor(x, y, x + w - 1, y);
     for (uint16_t i = x; i < x + w; i++)
     {
         LCD_WriteData_Word(color);
@@ -117,19 +101,7 @@ void paintHorLine(uint16_t x, uint16_t y, uint16_t w, uint16_t color)
 #define PI 3.141592653f
 #define DEGTORAD (PI / 180.0f)
 
-/**************************************************************************/
-/*!
-  @brief  Arc drawer with fill
-  @param  cx      Center-point x coordinate
-  @param  cy      Center-point y coordinate
-  @param  oradius Outer radius of arc
-  @param  iradius Inner radius of arc
-  @param  start   degree of arc start
-  @param  end     degree of arc end
-  @param  color   16-bit 5-6-5 Color to fill with
-*/
-/**************************************************************************/
-void writeFillArcHelper(uint16_t cx, WORD cy, WORD oradius, WORD iradius, float start, float end, uint16_t color)
+void Paint::writeFillArcHelper(uint16_t cx, WORD cy, WORD oradius, WORD iradius, float start, float end, uint16_t color)
 {
     if ((start == 90.0) || (start == 180.0) || (start == 270.0) || (start == 360.0))
     {
@@ -209,7 +181,7 @@ void writeFillArcHelper(uint16_t cx, WORD cy, WORD oradius, WORD iradius, float 
             {
                 if (len)
                 {
-                    paintHorLine(cx + x - len, cy + y, len, color);
+                    horizontalLine(cx + x - len, cy + y, len, color);
                     len = 0;
                 }
                 if (distance >= or2)
@@ -223,20 +195,7 @@ void writeFillArcHelper(uint16_t cx, WORD cy, WORD oradius, WORD iradius, float 
     } while (++y <= ye);
 }
 
-
-/**************************************************************************/
-/*!
-  @brief  Draw an arc with filled color
-  @param  x       Center-point x coordinate
-  @param  y       Center-point y coordinate
-  @param  r1      Outer radius of arc
-  @param  r2      Inner radius of arc
-  @param  start   degree of arc start
-  @param  end     degree of arc end
-  @param  color   16-bit 5-6-5 Color to fill with
-*/
-/**************************************************************************/
-void paintFillArc(WORD x, WORD y, WORD r1, WORD r2, float start, float end, uint16_t color)
+void Paint::fillArc(WORD x, WORD y, WORD r1, WORD r2, float start, float end, uint16_t color)
 {
     if (r1 < r2)
     {
@@ -265,8 +224,5 @@ void paintFillArc(WORD x, WORD y, WORD r1, WORD r2, float start, float end, uint
         start = .0;
         end = 360.0;
     }
-
-    // startWrite();
     writeFillArcHelper(x, y, r1, r2, start, end, color);
-    // endWrite();
 }
