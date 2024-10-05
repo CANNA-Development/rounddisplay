@@ -52,6 +52,10 @@ private:
 	void writeWord(uint16_t da);
 	void writeByte(uint8_t da); 
 
+	void writeCommand(uint8_t cmd, uint8_t val1); 
+	void writeCommand(uint8_t cmd, uint8_t val1, uint8_t val2);
+	void writeCommand(uint8_t cmd, uint8_t val1, uint8_t val2, uint8_t val3); 
+    void writeCommandLen(uint8_t cmd, const uint8_t* vals, uint8_t len);
 };
 
 #ifdef ASIM
