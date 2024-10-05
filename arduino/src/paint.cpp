@@ -101,7 +101,7 @@ void Paint::horizontalLine(uint16_t x, uint16_t y, uint16_t w, uint16_t color)
 #define PI 3.141592653f
 #define DEGTORAD (PI / 180.0f)
 
-void Paint::writeFillArcHelper(uint16_t cx, WORD cy, WORD oradius, WORD iradius, float start, float end, uint16_t color)
+void Paint::writeFillArcHelper(uint16_t cx, uint16_t cy, uint16_t oradius, uint16_t iradius, float start, float end, uint16_t color)
 {
     if ((start == 90.0) || (start == 180.0) || (start == 270.0) || (start == 360.0))
     {
@@ -195,7 +195,7 @@ void Paint::writeFillArcHelper(uint16_t cx, WORD cy, WORD oradius, WORD iradius,
     } while (++y <= ye);
 }
 
-void Paint::fillArc(WORD x, WORD y, WORD r1, WORD r2, float start, float end, uint16_t color)
+void Paint::fillArc(uint16_t x, uint16_t y, uint16_t r1, uint16_t r2, float start, float end, uint16_t color)
 {
     if (r1 < r2)
     {

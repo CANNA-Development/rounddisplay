@@ -52,10 +52,10 @@ public:
     void horizontalLine(uint16_t x, uint16_t y, uint16_t w, uint16_t color);
     void character(uint16_t xp, uint16_t yp, const uint8_t ch, const sFONT *font, uint16_t bcol, uint16_t fcol);
     void string(uint16_t xp, uint16_t up, const char *string, sFONT *Font, uint16_t bcol, uint16_t fcol);
-    void fillArc(WORD x, WORD y, WORD r1, WORD r2, float start, float end, uint16_t color);
+    void fillArc(uint16_t x, uint16_t y, uint16_t r1, uint16_t r2, float start, float end, uint16_t color);
 
 private:
-    void writeFillArcHelper(uint16_t cx, WORD cy, WORD oradius, WORD iradius, float start, float end, uint16_t color);
+    void writeFillArcHelper(uint16_t cx, uint16_t cy, uint16_t oradius, uint16_t iradius, float start, float end, uint16_t color);
 
     uint16_t _width;
     uint16_t _height;
