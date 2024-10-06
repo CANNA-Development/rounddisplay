@@ -1,5 +1,5 @@
-#ifndef ASIM_DRIVER_H
-#define ASIM_DRIVER_H
+#ifndef _DRIVER_H
+#define _DRIVER_H
 
 #ifdef ASIM
 
@@ -8,28 +8,29 @@
 class AsimDriver : public DisplayDriver
 {
 public:	
-	AsimDriver();
-	void init();
-	void drawArea(uint16_t x, uint16_t y, uint16_t w, uint16_t h);
-	void write(uint16_t color);	
-	uint16_t height() const {return LCD_WIDTH;};
-	uint16_t width() const {return LCD_HEIGHT;};
+	AsimDriver(uint16_t wiidth, uint16_t height);
+    void init() override;
+	void drawArea(uint16_t x, uint16_t y, uint16_t w, uint16_t h) override;
+	void write(uint16_t color) override;	
+
+    uint16_t height() const override;
+    uint16_t width() const override;
 
 private:
-	static const uint16_t LCD_WIDTH =  240;
-	static const uint16_t LCD_HEIGHT =  240;
 
-	uint16_t asim_x = 0;
-	uint16_t asim_y = 0;
-	uint16_t asim_xs = 0;
-	uint16_t asim_xe = 0;
-	uint16_t asim_ys = 0;
-	uint16_t asim_ye = 0;
-
+	uint16_t _x = 0;
+	uint16_t _y = 0;
+	uint16_t _xs = 0;
+	uint16_t _xe = 0;
+	uint16_t _ys = 0;
+	uint16_t _ye = 0;
+	uint16_t _width ;
+	uint16_t _height;
 
 };
 
-extern uint16_t asim_buffer[240*240];
+extern uint16_t *g_asim_buffer;
+
 #endif
 
 #endif

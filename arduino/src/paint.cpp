@@ -1,4 +1,4 @@
-#include "paint.h"
+#include "Paint.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h> //memset()
@@ -14,7 +14,6 @@ Paint::Paint( DisplayDriver& display)
 
 void Paint::init()
 {
-    _display.init();
     clear(BLACK);
 }
 

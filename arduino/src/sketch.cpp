@@ -7,7 +7,7 @@
 #endif
 
 
-#include "paint.h"
+#include "Paint.h"
 #include "fonts.h"
 
 
@@ -29,7 +29,9 @@ static const uint8_t  LCD_RST_PIN = 8;
 static float prev_angle = BEGIN_ANGLE;
 
 #ifdef ASIM
-    static AsimDriver driver;
+    const uint16_t LCD_WIDTH = 240;
+    const uint16_t LCD_HEIGHT = 240;
+    static AsimDriver driver = AsimDriver(LCD_WIDTH, LCD_HEIGHT);
 #else
     static LcdDriver driver(LCD_RST_PIN, LCD_DC_PIN);
 #endif
@@ -105,10 +107,7 @@ void setVolume(uint8_t level)
 
 void sketch_setup()
 {
-    #ifndef ASIM
-      //  Config_Init();
-    #endif
-
+    driver.init();
     paint.init();
     paint.string(driver.width()/2 - Font16.width * 7 /2, 80, "MDesign", &Font16, Paint::BLACK, Paint::GREEN);
     paint.fillArc(driver.width() / 2, driver.height() / 2, INNER_RADIUS, OUTER_RADIUS, BEGIN_ANGLE, END_ANGLE, RING_BCOL);
