@@ -107,6 +107,20 @@ void setVolume(uint8_t level)
 
 void sketch_setup()
 {
+
+    // reset TEST code
+    // pinMode(5, OUTPUT);
+    // digitalWrite(5, HIGH);
+    // delay(1);
+    // digitalWrite(5, LOW);
+    // delay(1);
+    // digitalWrite(5, HIGH);
+    // digitalWrite(5, HIGH);
+    // pinMode(5, OUTPUT);
+    // digitalWrite(5, HIGH);
+
+
+    //delay(1000);
     driver.init();
     paint.init();
     paint.string(driver.width()/2 - Font16.width * 7 /2, 80, "MDesign", &Font16, Paint::BLACK, Paint::GREEN);
